@@ -1,5 +1,5 @@
 
-  var users_d = [  
+  export var users_data = [  
       {  
          "nume":"Mia",
          "prenume":"Diaconu",
@@ -281,9 +281,6 @@
          "media":6.084468837721094
       }
    ]
-  
- export function users() {
-    return users_d;
- }
+
 
  

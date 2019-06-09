@@ -2,27 +2,25 @@ import React, { Component } from 'react';
 
 class Profile extends Component {
     render() {
-        var user = { ...this.props.state.display };
-        var media = Number(user.media).toFixed(2);
-        console.log(user.nume)
-
+        var user = this.props.state.sugestions.find( el => (el.email ===this.props.state.display) ) ;
+         
+        if (user === undefined) {
+           return <h3>Please select a user</h3>
+        } 
+        
         return ( 
             <div className="profile">
-                <div className="title">Profile</div>
-                <img src={ user.photo_url } alt={ user.nume } />
-                <div className="name">
-                 {user.nume} {user.prenume}
-                </div>
-                <div className="profile-data">
-                    <div className="born">
-                   
-                    {user.data_nasterii.anul}
+                   <div className="title">Profile</div>
+                    <div className="name">
+                         {user.firstname} {user.lastname}
                     </div>
-                    <div className="tel">Telefon: { user.nr_telefon }</div>
-                    <div className="cnp">CNP: { user.cnp }</div>
-                    <div className="med">Media: { media }</div>
-                </div>
-                
+                    <img src={ user.photo } alt={ user.email } />
+                    <div className="tel">
+                         Phone: { user.tel }
+                    </div>
+                    <div className="email">
+                        Email: { user.email }
+                    </div>    
             </div>
         );
     }
