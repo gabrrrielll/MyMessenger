@@ -278,7 +278,7 @@ p.underlineHover {
 .left , .right{
   width: 25%;
   border: 1px solid #ccc;
-  height: 100%;
+ 
   background: rgba(0, 123, 255, 0.05);
 }
 .left{
@@ -313,15 +313,19 @@ p.underlineHover {
 .user{
   text-align: left;
   cursor: pointer;
+  box-shadow: 0px 2px 11px #343a4045;
+  margin-bottom: 2px;
+  position: relative;
 }
 .user:hover{
   background: #8080802e;
 }
-.user img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin: 10px 10px 5px 10px;
+.user img,
+.friend-photo {
+  width: 40px!important;
+  height: 40px!important;
+  border-radius: 50%!important;
+  margin: 10px 10px 5px 10px!important;
 }
 .profile img {
   width: 200px;
@@ -342,7 +346,7 @@ p.underlineHover {
 .profile .name{
   font-size: 150%;
   font-weight: 600;
-  padding-top: 10px;
+  padding-top: 0;
 }
 .title {
   position: sticky;
@@ -360,6 +364,17 @@ p.underlineHover {
 button {
   float: right;
   margin: 15px 10px 0 0;
+  border-radius: 4px;
+  box-shadow: 2px 2px 2px #66747f52;
+  cursor: pointer;
+  background: #76c1f1;
+  color: white;
+  padding: 1px 8px!important;
+}
+.user.request {
+  background: #ff9200c2;
+  color: white;
+  border-bottom: 1px solid grey;
 }
 
 
@@ -377,7 +392,7 @@ div#inputMessage {
 input.message-submit {
   margin-left: 4px;
 }
-span#text-mesage {
+#text-mesage {
   padding: 9px 14px;
   background: #7db0e7e0;
   margin: 16px auto;
@@ -385,11 +400,15 @@ span#text-mesage {
   width: unset!important;
   color: white;
   line-height: 2;
-  /* float: left; */
+
 }
 div#conversation {
-  height: 390px;
+  height: 460px;
   overflow-y: auto;
+  position: relative;
+  bottom: 0px;
+  top:0px; 
+  padding:50px 5px;
 }
 .oriented-left {
   text-align: left!important;
@@ -414,4 +433,103 @@ span.time-message {
   line-height: 1;
   width: 100%;
   height: 40px;
+}
+button.addFriend {
+  padding: 0;
+}
+button.addFriend img{
+  width: 25px;
+  height: 20px;
+  margin: -6px 6px -3px;
+}
+.users center {
+  background: #e74b0eed;
+  height: 40px;
+  line-height: 40px;
+  color: white;
+  box-shadow: 0 0 4px #0000003d;
+  margin: 20px 8px;
+}
+span#profile {
+  font-size: 26px;
+  position: relative;
+  left: 88%;
+  cursor: pointer;
+  top: 6px;
+}
+span#counter {
+  position: absolute;
+  top: -8px;
+  right: -9px;
+  font-size: 16px;
+  background: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+}
+.alert-inform {
+  cursor: pointer;
+  background: #ff9200c2;
+  color: white;
+  height: 30px;
+  line-height: 30px;
+}
+#online-bullet img{
+  width: 20px;
+  margin: 1px 4px;
+
+}
+.last-activity{
+  margin-top: 10px;
+  font-weight: 500;
+  font-size: 16px;
+  color: rgb(13, 127, 180);
+}
+
+#inform {
+  width: 93%;
+  background: #fffa0075;
+  line-height: 40px;
+  border-radius: 6px;
+}
+
+#logout {
+  background: #4b4b4b;
+}
+div#message {
+  position: relative;
+  bottom: 40px;
+}
+.message_fragment {
+  text-align: left;
+  width: 90%;
+  padding: 1px 30px 2px 64px;
+  line-height: 2;
+  position: absolute;
+  top: 26px;
+  color: #6c757dcc;
+  font-weight: 300;
+  font-size: 90%;
+  float: left;
+  left: -5px;
+  height: 30px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+span#edit-profile {
+  font-size: 37px;
+  position: absolute;
+  top: -2px;
+  right: 175px;
+  font-weight: 900;
+  cursor: pointer;
+}
+.edit-profile ~ #inputMessage {
+  display: none!important;
+}
+.message_fragment[ style="font-weight: bold;" ]{
+  color: rgb(0, 0, 0);
 }

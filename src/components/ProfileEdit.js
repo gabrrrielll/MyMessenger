@@ -1,24 +1,14 @@
 import React from 'react';
 
-const Register = ( props ) =>{
+const ProfileEdit = ( props ) =>{
     return (
         <div className="wrapper fadeInDown">
             <div id="formContent" >
               <div className="fadeIn first">
-              <i className="fa fa-user"> Register</i>
+              <i className="fa fa-user"> Edit your profile</i>
               </div>
                   <table>
-                  <tbody>
-                      <tr>
-                          <td>
-                              <input type="text" id="username" className="fadeIn second" name="username" placeholder="Username"
-                                onChange={props.updateData} />
-                          </td>
-                          <td>
-                              <input type="text" id="email" className="fadeIn second" name="email" placeholder="Email"
-                                onChange={props.updateData} />
-                          </td>
-                     </tr>
+                  <tbody> 
                       <tr>
                           <td>
                               <input type="text" id="firstname" className="fadeIn second" name="firstname" placeholder="Firstname"
@@ -31,11 +21,11 @@ const Register = ( props ) =>{
                       </tr>
                       <tr>
                           <td>
-                              <input type="text" id="password" className="fadeIn second" name="password"  placeholder="Password"
+                              <input type="text" id="password" className="fadeIn second" name="password"  placeholder="Old password"
                               onChange={props.updateData} />
                           </td>
                           <td>
-                              <input type="text" id="rpassword" className="fadeIn second" name="rpassword"  placeholder="Repeat password"
+                              <input type="text" id="rpassword" className="fadeIn second" name="rpassword"  placeholder="New password"
                                 onChange={props.updateData} />
                           </td>
                       </tr>
@@ -51,15 +41,13 @@ const Register = ( props ) =>{
                       </tr>
                   </tbody>
               </table>
-                  <input type="submit" className="fadeIn fourth" onClick={props.tryRegister} value="Register"  /> <br/>  
+                  <input type="submit" className="fadeIn fourth" onClick={props.tryRegister} value="Submit"  /> <br/>  
                 <label id="inform">{props.state.inform}</label>   
                 
-              <div id="formFooter">
-                <p className="underlineHover"  onClick={props.changeForm}>Do you have a count?<b>Login!</b> </p>
-          </div>
+              
         </div>
       </div>
     );
 }
 
-export default Register;
+export default ProfileEdit;
