@@ -1,9 +1,16 @@
 import React from "react";
 import ProfileEdit from "./ProfileEdit";
+import  Info from "./Info"
 
 class Message extends React.Component {
+
+  componentWillReceiveProps(){
+      //scroll up the consversation
+      this.props.scrollUP(); 
+  }
  
   render() {
+    
     function convertUNIX(input) {
       var time = new Date(input);
       return time.toLocaleTimeString();
@@ -18,6 +25,7 @@ class Message extends React.Component {
             return "oriented-right";
         }
     };
+
     if( this &&  this.props.state.participants !== null  ){
         var seenTime = this.props.state.participants[0] &&
         this.props.state.participants.find( el => el.email !== this.props.state.me.email ).seen
@@ -27,11 +35,34 @@ class Message extends React.Component {
          seenTime = null;
     }
    
-    if(this.props.state.profile_edit){
+/*     if (document.getElementById("message")){
+      var input = document.getElementById("message");
+      input.addEventListener("keyup", function(event) {
+        if (event.keyCode === 13) {
+         event.preventDefault();
+         document.getElementById("message-submit").click();
+        }
+      })
+    } */
+
+  
+    if( this.props.state.profile_edit ){
       return (
       <div className="edit-profile">
             <ProfileEdit
-               state={this.props.state} /> 
+               state={this.props.state} 
+               updateData={this.props.updateData} 
+               profileChange={this.props.profileChange}/> 
+      </div>
+       
+      );
+     }
+     if( this.props.state.info){
+      return (
+      <div className="edit-profile">
+            <Info
+               state={this.props.state} />
+         
       </div>
        
       );
@@ -41,7 +72,7 @@ class Message extends React.Component {
       <div>
         <div className="title">Conversations</div>
         <div id="conversation">
-          { this.props.state.conversation.map((mes, index) => {
+          { this.props.state.conversation && this.props.state.conversation.map((mes, index) => {
             return (
               <div key={index} id="message" className={ setStyle(mes.email) }>
                     { <span id="text-mesage"> { mes.text }  </span> }
@@ -58,7 +89,9 @@ class Message extends React.Component {
         </div>
       </div>
     );
+    
   }
+ 
 }
 
 export default Message;

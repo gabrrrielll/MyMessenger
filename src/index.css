@@ -273,6 +273,7 @@ p.underlineHover {
   width: 100%;
   height: 100%;
   margin: 0;
+  overflow: hidden;
 }
 
 .left , .right{
@@ -317,10 +318,47 @@ p.underlineHover {
   margin-bottom: 2px;
   position: relative;
 }
+.user-alert{
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0px 2px 11px #343a4045;
+  margin-bottom: 2px;
+  position: relative;
+  background: linear-gradient(270deg, #dd002c7e, #00dd5891, #0016dd52);
+background-size: 600% 600%;
+
+-webkit-animation: alarm 1s ease infinite;
+-moz-animation: alarm 1s ease infinite;
+-o-animation: alarm 1s ease infinite;
+animation: alarm 1s ease infinite;
+
+}
+
+@-webkit-keyframes alarm {
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+}
+@-moz-keyframes alarm {
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+}
+@-o-keyframes alarm {
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+}
+@keyframes alarm { 
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+}
 .user:hover{
   background: #8080802e;
 }
 .user img,
+.user-alert img,
 .friend-photo {
   width: 40px!important;
   height: 40px!important;
@@ -359,7 +397,7 @@ p.underlineHover {
   width: 100%;
   line-height: 40px;
   font-weight: 700;
-  top: 50px;
+  top: 0;
 }
 button {
   float: right;
@@ -389,7 +427,7 @@ div#inputMessage {
 #inputMessage input{
   width: 100%;
 }
-input.message-submit {
+input#message-submit {
   margin-left: 4px;
 }
 #text-mesage {
@@ -527,9 +565,16 @@ span#edit-profile {
   font-weight: 900;
   cursor: pointer;
 }
-.edit-profile ~ #inputMessage {
-  display: none!important;
-}
+
 .message_fragment[ style="font-weight: bold;" ]{
   color: rgb(0, 0, 0);
+}
+#formContent h5 {
+  padding: 20px;
+  color: #ffc107;
+  font-weight: 300;
+  font-family: sans-serif;
+}
+#formContent h5 span{
+  font-size: 30px;
 }

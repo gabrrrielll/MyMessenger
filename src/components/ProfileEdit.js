@@ -12,11 +12,11 @@ const ProfileEdit = ( props ) =>{
                       <tr>
                           <td>
                               <input type="text" id="firstname" className="fadeIn second" name="firstname" placeholder="Firstname"
-                                onChange={props.updateData} />
+                                onChange={props.updateData} defaultValue={props.state.me.firstname} />
                           </td>
                           <td>
                             <input type="text" id="lastname" className="fadeIn second" name="lastname" placeholder="Lastname"
-                                onChange={props.updateData} />
+                                onChange={props.updateData}  defaultValue={props.state.me.lastname}/>
                           </td>
                       </tr>
                       <tr>
@@ -32,16 +32,16 @@ const ProfileEdit = ( props ) =>{
                       <tr>
                         <td>
                             <input type="text" id="tel" className="fadeIn second" name="tel" placeholder="Phone"
-                            onChange={props.updateData} />
+                            onChange={props.updateData}  defaultValue={props.state.me.tel}/>
                         </td>
                         <td>
                               <input type="text" id="photo" className="fadeIn second" name="photo" placeholder="Photo"
-                                onChange={props.updateData} />
+                                onChange={props.updateData} defaultValue={props.state.me.photo}/>
                         </td>
                       </tr>
                   </tbody>
               </table>
-                  <input type="submit" className="fadeIn fourth" onClick={props.tryRegister} value="Submit"  /> <br/>  
+                  <input type="submit" className="fadeIn fourth" onClick={props.profileChange} value="Submit"  /> <br/>  
                 <label id="inform">{props.state.inform}</label>   
                 
               

@@ -13,7 +13,7 @@ class FrontendApp extends React.Component {
   constructor() {
     super();
     
-    var initialstate = {
+     this.initialstate = {
       username: "",
       email: "",
       firstname: "",
@@ -40,13 +40,14 @@ class FrontendApp extends React.Component {
       participants: [],
       show: false,
       profile_edit: false,
-      data: []
+      data: [],
+      info: false
     };
 
-    this.state = initialstate;
+    this.state = this.initialstate;
   
   }
-  initialstat = {
+/*   initialstat = {
     username: "",
     email: "",
     firstname: "",
@@ -74,41 +75,60 @@ class FrontendApp extends React.Component {
     participants: [],
     profile_edit: false,
     data: []
-  };
+  }; */
 
-  componentDidMount(){
-    this.checkToken();
-    this.users();
-    
- } 
+ 
+ componentWillMount(){
+  this.checkToken();
+  this.users(); 
 
+}
+componentDidMount(){
+  if (this.state.data[0]){
+    //alert("aici")
+     this.display( this.state.data[0].email)
+     }
+    // this.setState({ friends: this.sortFriends() })
+} 
   users = () => {
+  
       if (window.localStorage.getItem("token")) {
             axios.get("http://localhost:4000/users", {
               headers: {
                 token: window.localStorage.getItem("token")
               }
             })
-            .then(res => {
-                 if ( res.data.me.friends.length > 0 ){
-                          var friendsActivity = res.data.me.friends.sort(
-                                  ( a, b ) => (a.last_activity < b.last_activity) ? 1 : ((b.last_activity < a.last_activity) ? -1 : 0)
-                            ) 
+            .then(res => {console.log("friendsActivity",res.data.me.friends)
+                 if ( res.data.me.friends.length === 0 ){
+                  
+                        /*   var friendsActivity = res.data.me.friends
+                          //.sort(
+                                 // ( a,b) => (a.last_activity < b.last_activity) ? 1 : ((b.last_activity < a.last_activity) ? -1 : 0)
+                                 // {last_activity: -1}
+                           // ) 
                             //console.log("friendsActivity", friendsActivity)
                             var  emailFirst = friendsActivity[0]; 
-                    } else{ 
-                      emailFirst = res.data.users[0].email  
+                            
+                    } else{ */
+                      var conversation = [ {
+                        text: "Conversations are allowed only between friends :)).",
+                        email: this.state.me.email,
+                        time: Date.now()
+                      }]
+                     var  emailFirst = res.data.users[0].email ;
+                     var info = true;
                      } 
-                      this.getTextFragment( res.data.me.friends )
+                      
                       this.setState({
                           me: res.data.me,
                           sugestions: res.data.users,
-                          display: emailFirst
+                          display: emailFirst,
+                          conversation: conversation,
+                          info: info
                         
                           })
-                          this.display(this.state.display);
-                          this.scrollUP(); 
-                         // console.log("s-a activat!")
+                       this.getTextFragment( )
+                       
             })
             .catch(err => {
               this.logout();
@@ -117,13 +137,68 @@ class FrontendApp extends React.Component {
         } else {
          // this.logout();
         }
+       
   }
-  getTextFragment = ( friends ) => {
+  display = (email) =>{
+    //console.log("display-->email: ", email)
+        if ( this.state.profile_edit ) {
+          this.setState( { profile_edit: false } )
+        };
+      axios.get("http://localhost:4000/conversation", {
+        headers: {
+          token: window.localStorage.getItem("token"),
+          hisemail: email
+        }
+          })
+          .then(res => {
+            
+                  if ( res.data.data !==null ){
+                   //console.log( "res.data.data.messages", res.data.data.messages)
+                    this.setState({ 
+                     display:  email,
+                      conversation: res.data.data.messages,
+                      participants: res.data.data.participants
+                    });
+              
+                  } else{
+                    var conversation = [ {
+                      text: "Conversations are allowed only between friends :)).",
+                      email: this.state.me.email,
+                      time: Date.now()
+                    }]
+                    this.setState({ 
+                      display:  email,
+                      conversation: conversation,
+                      participants: []
+                    });
+                  }
+                  
+              
+             // console.log( "res.data.data.messagesl, ",res.data.data.messages, );
+             
+          })
+          .catch(err => {
+              console.log("Error in DB for display conversation", err)
+       
+              this.setState({ 
+                display:  email,
+                conversation: [],
+                participants: []
+              });
+              
+          })
+          //this.getTextFragment( email );
+          this.scrollUP(); 
+       
+         
+    
+    }
+  getTextFragment = ( ) => {
       
         var data={};
-        console.log( friends, " friends")
-        if( friends !== undefined ){
-              friends.map( email =>{
+       // console.log( friends, " friends")
+        if( this.state.me.friends !== undefined ){
+              this.state.me.friends.map( email =>{
                 
                         axios.get("http://localhost:4000/convfragment", {
                                     headers: {
@@ -135,15 +210,16 @@ class FrontendApp extends React.Component {
                                     
                                           if ( res ===null ){
                                           
-                                          console.log(" No data" )
+                                          //console.log(" No data" )
                                               data = {
                                                         email: email,
                                                           wasSeen: false,
                                                           fragment : "" 
                                                         }
+                                             this.setState({ data: data })
                                     
                                           } else{
-                                          console.log( "res.data.data.messagesl, ", friends, res.data.wasSeen, res.data.fragment );
+                                          //console.log( "res.data.data.messagesl, ", friends, res.data.wasSeen, res.data.fragment );
                                             data = {
                                                       email: email,
                                                       wasSeen: res.data.wasSeen,
@@ -156,15 +232,16 @@ class FrontendApp extends React.Component {
                                 
                                   })
                                   .catch(err => {
-                                      console.log("Error in DB for display conversation", err)
+                                      console.log("Error in DB for extract messages fragments", err)
                                         data = {
                                                   wasSeen:false,
                                                   fragment : "" 
                                                 }
+                                                this.setState({ data: data })
                                   
                                   })
                           
-                                  return console.log("data", data)    
+                                  return  data  
               })
                          
         }
@@ -181,123 +258,99 @@ updateData = (event) => {
     })
    
   }
-
+profileChange = () =>{
+        if ( this.state.firstname ){
+          var firstname = this.state.firstname
+        } else {
+          firstname = this.state.me.firstname
+        }
+        if ( this.state.lastname ){
+          var lastname = this.state.lastname
+        } else {
+          lastname = this.state.me.lastname
+        }
+        if ( this.state.tel ){
+          var tel = this.state.tel
+        } else {
+          tel = this.state.me.tel
+        }
+        if ( this.state.photo ){
+          var photo = this.state.photo
+        } else {
+          photo = this.state.me.photo
+        }
+      axios.post("http://localhost:4000/changeprofile",{
+       
+        token: window.localStorage.getItem("token"),
+        firstname: firstname,
+        lastname: lastname,
+        original_pass: this.state.password,
+        new_pass: this.state.rpassword,
+        tel: tel,
+        photo: photo
+      })
+      .then( response => {
+        this.users();
+            console.log(" response",  response)
+           
+             if (this.state.me.email){
+              this.setState( {
+                 inform: response.data.inform,
+                display: this.state.me.email
+               })
+            } 
+           
+      })
+      .catch(error => {
+            console.log(error, "eroare la accesare")
+            this.setState( { inform: "Old password didn't match!"})
+      });
+}
 changeForm =() =>{
     this.setState({ autentificate: !this.state.autentificate} );
   }
 
 logout = () =>{
     window.localStorage.removeItem("token");
-    this.setState( this.initialstat );
+    this.setState( this.initialstate );
     //console.log( "this.initialstate", this.initialstat)
 }
  scrollUP =()=> {
-  var elmnt = document.getElementById("conversation");
-  if ( elmnt !== null ){
-    elmnt.scrollTop = elmnt.scrollHeight;
-  }
+  // console.log("acum scrollUP")
+      var elmnt = document.getElementById("conversation");
+      if ( elmnt !== null ){
+        elmnt.scrollTop = elmnt.scrollHeight;
+      }
   
 
 }
 showProfile = () => {
  
-  this.setState( { show: !this.state.show } );
-  this.display( this.state.me.email )
+  this.setState( {
+     show: !this.state.show ,
+     display: this.state.me.email 
+    } );
+
+  
+}
+editProfile=()=>{
+  if (this.state.me && this.state.display === this.state.me.email){
+              if (this.state.friends && this.state.friends.length > 0){
+                var dis = this.state.friends[0].email
+              } else {
+                dis = this.state.sugestions[0].email
+              }   
+  } else{
+    dis = this.state.me.email
+  }
+  this.setState( {
+   
+     profile_edit: !this.state.profile_edit ,
+     display: dis,
+     inform: ""
+    } )
 }
 
-display = (email) =>{
-
-    if ( this.state.profile_edit ) {
-      this.setState( { profile_edit: false } )
-    };
-  axios.get("http://localhost:4000/conversation", {
-    headers: {
-      token: window.localStorage.getItem("token"),
-      hisemail: email
-    }
-      })
-      .then(res => {
-        
-              if ( res.data.data !==null ){
-               
-                this.setState({ 
-                  display:  email,
-                  conversation: res.data.data.messages,
-                  participants: res.data.data.participants
-                });
-              } else{
-                var conversation = [ {
-                  text: "Conversations are allowed only between friends.",
-                  email: this.state.me.email,
-                  time: Date.now()
-                }]
-                this.setState({ 
-                  display:  email,
-                  conversation: conversation,
-                  participants: []
-                });
-              }
-              
-          
-         // console.log( "res.data.data.messagesl, ",res.data.data.messages, );
-         
-      })
-      .catch(err => {
-          console.log("Error in DB for display conversation", err)
-         /*  var conversation = [ {
-            text: "Conversations are allowed only between friends.",
-            email: this.state.me.email,
-            time: Date.now()
-          }] */
-          this.setState({ 
-            display:  email,
-            conversation: "nimic aici",
-            participants: "nu sunt"
-          });
-          
-      })
-      //this.getTextFragment( email );
-      this.scrollUP(); 
-      
-
-}
-/* getTextFragment = ( email ) => {
-  axios.get("http://localhost:4000/convfragment", {
-            headers: {
-              token: window.localStorage.getItem("token"),
-              hisemail: email
-            }
-      })
-      .then(res => {
-        
-              if ( res ===null ){
-               
-               console.log(" No data" )
-               var   data = {
-                wasSeen: false,
-                fragment : "" 
-              }
-              return(<div>Nimic!</div> )
-              } else{
-               console.log( "res.data.data.messagesl, ", email, res.data.wasSeen, res.data.fragment );
-                data = {
-                  wasSeen: res.data.wasSeen,
-                  fragment : res.data.fragment 
-                }
-                return data
-              }
-         
-      })
-      .catch(err => {
-          console.log("Error in DB for display conversation", err)
-            var data = {
-            wasSeen:false,
-            fragment : "" 
-          }
-          return(<div>Nimic!</div> )
-      })
-        
-} */
 setConversationSeen = ( email ) =>{
 alert("apelare setConversationSeen")
   axios.get("http://localhost:4000/setconversationseen", {
@@ -331,8 +384,6 @@ console.log(" toUserEmail",  this.state.message );
         this.display(this.state.display);
         this.setState( { message: "" })
         this.scrollUP(); 
-      
-        
       })
       .catch(err => {
           console.log(err)
@@ -468,9 +519,7 @@ acceptFriendRequest = (email) => {
       });
      
   }
-editProfile=()=>{
-  this.setState( { profile_edit: !this.state.profile_edit } )
-}
+
 checkToken = ()=>{
 
       axios.post("http://localhost:4000/checkToken",{
@@ -486,13 +535,70 @@ checkToken = ()=>{
         
 } 
 
+sortFriends = () => {
+  if (this.state.me.friends) {
+      return this.state.sugestions.filter((friend) => {
+      var exist = this.state.me.friends.some(email => email === friend.email);
+      return exist;
+    }).sort((a, b) => {
+      if (a.last_activity > b.last_activity) {
+        return -1;
+      } else if (a.last_activity < b.last_activity) {
+        return 1;
+      }
+      return 0;
+    })
+
+    // return this.props.state.me.friends.map(email => {
+    //   var friends = [
+    //     ...this.props.state.friends,
+    //     this.props.state.sugestions.find(x => x.email === email)
+    //   ];
+
+    //   var orderedFriends = friends.sort((a, b) =>
+    //     a.last_activity < b.last_activity
+    //       ? 1
+    //       : b.last_activity < a.last_activity
+    //       ? -1
+    //       : 0
+    //   );
+
+    //   return orderedFriends;
+    // });
+  } else {
+    return []
+  }
+};
+
 
 
 render() {
+  if(this.state.friends && 
+     this.state.friends !== undefined && 
+     this.state.me.friends &&
+     this.state.me.friends.length > 0 
+     ){
+          if (JSON.stringify(this.state.friends) !== JSON.stringify(this.sortFriends())) {
+            //console.log(" se activeaza")
+            this.setState({friends: this.sortFriends(),
+            // display: this.sortFriends()[0].email
+            })
+            this.display(this.sortFriends()[0].email)
+          }
+  }  else if (this.state.sugestions && this.state.sugestions.length > 0 ){
+        if(this.state.display !== this.state.sugestions[0].email){
+        //this.display(this.state.sugestions[0].email)
+        //this.setState( { display: this.state.sugestions[0].email })
+        console.log("s-a ajuns aici")
+        }
+
+  } 
  
 
     if ( this.state.authorized ){
      // this.reload(); 
+   
+   
         return( 
           <Messenger 
                 logout ={this.logout}
@@ -507,7 +613,9 @@ render() {
                 removeFriend={this.removeFriend}
                 showProfile={ this.showProfile }
                 editProfile={ this.editProfile }
-                getTextFragment={ this.getTextFragment }
+                profileChange={this.profileChange}
+                scrollUP ={this.scrollUP }
+                //getTextFragment={ this.getTextFragment }
                 //users={this.users}
              />
         )
