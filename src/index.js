@@ -5,10 +5,12 @@ import "./index.css";
 import Messenger from "./components/Messenger"
 import LogIn from "./components/LogIn";
 import Register from "./components/Register";
+import socketIOClient from "socket.io-client";
 //import ReactInterval from 'react-interval';
 import "./functions";
 
 
+var  socket= null;
 class FrontendApp extends React.Component {
   constructor() {
     super();
@@ -25,12 +27,10 @@ class FrontendApp extends React.Component {
       message: "",
       inform: "",
       myEmail: "",
-      me: {},
-      //messages: [],
+      me: "",
       users: [],
       autentificate: true,
       authorized: false,
-     // acces: false,
       display: "",
       conversation: [],
       requests: [],
@@ -41,54 +41,94 @@ class FrontendApp extends React.Component {
       show: false,
       profile_edit: false,
       data: [],
-      info: false
+      response: false,
+      endpoint: 'http://localhost:4001'
     };
 
     this.state = this.initialstate;
   
   }
-/*   initialstat = {
-    username: "",
-    email: "",
-    firstname: "",
-    lastname: "",
-    password: "",
-    rpassword: "",
-    tel: "",
-    photo: "",
-    message: "",
-    inform: "",
-    //messages: [],
-    myEmail: "",
-    me: {},
-    users: [],
-    autentificate: true,
-    authorized: false,
-   // acces: false,
-    display: "",
-    conversation: [],
-    requests: [],
-    friends: [],
-    sugestions: [],
-    requestSent: [],
-    show: false,
-    participants: [],
-    profile_edit: false,
-    data: []
-  }; */
 
- 
+
+
+
  componentWillMount(){
-  this.checkToken();
-  this.users(); 
+  
+
+  //var token = window.localStorage.getItem("token");
+  //console.log("token--------------", token )
+ /// socket.on("conversationAPI"+ token, data => this.setState({ conversation: data.messages, participants:data.participants}  , 
+  // console.log("conversationAPI: ",data) ));
+/*   if( this.state.users && 
+    this.state.sugestions &&
+    this.state.me &&
+    this.state.friends &&
+    this.state.users.length < 1 ){
+    var users = [ ...this.state.sugestions, this.state.me, this.state.friends ]
+    this.setState( { users: users })
+    console.log("new Users", users)
+   } */
+
+  //first time load all users from db
+//  this.users(); 
+
 
 }
-componentDidMount(){
-  if (this.state.data[0]){
-    //alert("aici")
-     this.display( this.state.data[0].email)
-     }
-    // this.setState({ friends: this.sortFriends() })
+
+loadData=( myEmail )=>{
+  var token = window.localStorage.getItem("token");
+  if ( myEmail === "" && token ){
+    this.logout();
+  }
+    if( !token ){
+      return
+    }    
+   // const socket = socketIOClient( this.state.endpoint );
+   socket = socketIOClient(this.state.endpoint);
+          socket.on("usersAPI"+ myEmail, users => {
+            
+                var me = users.find( el => el.email === myEmail )
+                var sugestions =me && users.filter( user => user.email !== me.email )
+                .filter( el => el.email !== me.friends.find( email=> email === el.email ))
+                .filter( elem => elem.email !== me.friends_requests.find( email=> email === elem.email ))
+                .sort((a, b) => {
+                  if (a.last_activity > b.last_activity) {
+                      return -1;
+                  } else if (a.last_activity < b.last_activity) {
+                      return 1;
+                  }
+                  return 0;
+                })
+                var friends = me &&users.filter( friend => friend.email === me.friends.find( email=> email === friend.email ))
+                .sort((a, b) => {
+                  if (a.last_activity > b.last_activity) {
+                      return -1;
+                  } else if (a.last_activity < b.last_activity) {
+                      return 1;
+                  }
+                  return 0;
+                })
+        
+            this.setState({ users , me , sugestions , friends }  ,
+              /*   console.log("users received: ",users) */  )} );
+
+
+         /*  socket.on("meAPI" + token, me => this.setState({ me: me }  , 
+                    console.log("me: ", me )   )); */
+          
+          socket.on("fragmentAPI"+ myEmail, data => this.setState({ data: data }  
+              /*   console.log("data: ",data)  */ ));
+                
+
+           socket.on("conversationAPI"+ myEmail, data => this.setState({ conversation: data.messages, participants:data.participants}  
+                /*   console.log("conversationAPI: ",data)  */)); 
+ 
+}
+componentDidMount() {
+  
+  this.checkToken( this.state.myEmail );
+
+ 
 } 
   users = () => {
   
@@ -98,36 +138,27 @@ componentDidMount(){
                 token: window.localStorage.getItem("token")
               }
             })
-            .then(res => {console.log("friendsActivity",res.data.me.friends)
+            .then(res => {
+            //this situation is when load only sugestions without friends
                  if ( res.data.me.friends.length === 0 ){
                   
-                        /*   var friendsActivity = res.data.me.friends
-                          //.sort(
-                                 // ( a,b) => (a.last_activity < b.last_activity) ? 1 : ((b.last_activity < a.last_activity) ? -1 : 0)
-                                 // {last_activity: -1}
-                           // ) 
-                            //console.log("friendsActivity", friendsActivity)
-                            var  emailFirst = friendsActivity[0]; 
-                            
-                    } else{ */
-                      var conversation = [ {
-                        text: "Conversations are allowed only between friends :)).",
-                        email: this.state.me.email,
-                        time: Date.now()
-                      }]
-                     var  emailFirst = res.data.users[0].email ;
-                     var info = true;
+                            if( !this.state.display){
+                              console.log("nu este display!")
+                              this.setState ( { display:  res.data.users[0].email} )
+                            }
+                 
                      } 
+                     this.setState({
+                     // me: res.data.me,
+                      //sugestions: res.data.users,
+                     // info: true,
+                      loaded: true
+                    
+                      })
+                  
                       
-                      this.setState({
-                          me: res.data.me,
-                          sugestions: res.data.users,
-                          display: emailFirst,
-                          conversation: conversation,
-                          info: info
-                        
-                          })
-                       this.getTextFragment( )
+                      // this.display(this.state.display )
+
                        
             })
             .catch(err => {
@@ -140,7 +171,7 @@ componentDidMount(){
        
   }
   display = (email) =>{
-    //console.log("display-->email: ", email)
+   // console.log("display-->email: ", email)
         if ( this.state.profile_edit ) {
           this.setState( { profile_edit: false } )
         };
@@ -156,8 +187,8 @@ componentDidMount(){
                    //console.log( "res.data.data.messages", res.data.data.messages)
                     this.setState({ 
                      display:  email,
-                      conversation: res.data.data.messages,
-                      participants: res.data.data.participants
+                      //conversation: res.data.data.messages,
+                      //participants: res.data.data.participants
                     });
               
                   } else{
@@ -196,7 +227,7 @@ componentDidMount(){
   getTextFragment = ( ) => {
       
         var data={};
-       // console.log( friends, " friends")
+       console.log( data, " data ptr extragere fragment")
         if( this.state.me.friends !== undefined ){
               this.state.me.friends.map( email =>{
                 
@@ -210,7 +241,7 @@ componentDidMount(){
                                     
                                           if ( res ===null ){
                                           
-                                          //console.log(" No data" )
+                                          console.log(" No data" )
                                               data = {
                                                         email: email,
                                                           wasSeen: false,
@@ -219,7 +250,7 @@ componentDidMount(){
                                              this.setState({ data: data })
                                     
                                           } else{
-                                          //console.log( "res.data.data.messagesl, ", friends, res.data.wasSeen, res.data.fragment );
+                                          console.log( "res.data.data.messagesl, ", res.data.wasSeen, res.data.fragment );
                                             data = {
                                                       email: email,
                                                       wasSeen: res.data.wasSeen,
@@ -290,7 +321,7 @@ profileChange = () =>{
         photo: photo
       })
       .then( response => {
-        this.users();
+        //this.users();
             console.log(" response",  response)
            
              if (this.state.me.email){
@@ -311,9 +342,26 @@ changeForm =() =>{
   }
 
 logout = () =>{
-    window.localStorage.removeItem("token");
-    this.setState( this.initialstate );
-    //console.log( "this.initialstate", this.initialstat)
+
+        /* axios.post("http://localhost:4000/stopdata",{
+          token:  window.localStorage.getItem("token"),
+          stop: true
+        })
+        .then(res => {
+          console.log( "response stop load data:", res )
+          
+
+        })
+        .catch(err => {
+            console.log("Error in DB for stop load data", err)
+            
+          
+        })
+     */
+        //socket.on= null;
+        window.localStorage.removeItem("token");
+      this.setState( this.initialstate );
+
 }
  scrollUP =()=> {
   // console.log("acum scrollUP")
@@ -325,7 +373,6 @@ logout = () =>{
 
 }
 showProfile = () => {
- 
   this.setState( {
      show: !this.state.show ,
      display: this.state.me.email 
@@ -351,24 +398,6 @@ editProfile=()=>{
     } )
 }
 
-setConversationSeen = ( email ) =>{
-alert("apelare setConversationSeen")
-  axios.get("http://localhost:4000/setconversationseen", {
-    headers: {
-      token: window.localStorage.getItem("token"),
-      hisemail: email
-    }
-      })
-      .then(res => {
-        console.log( "setConversationSeen   ->  res.data: ", res.data  );
-     
-      })
-      .catch(err => {
-          console.log(err)
-      })
-
-
-}
 sendMessage = ( ) =>{
 console.log(" toUserEmail",  this.state.message );
   if( this.state.message === "" ) return; 
@@ -380,7 +409,7 @@ console.log(" toUserEmail",  this.state.message );
     
       })
       .then(res => {
-          console.log( "res.data: ", res.data  );
+         // console.log( "res.data: ", res.data  );
         this.display(this.state.display);
         this.setState( { message: "" })
         this.scrollUP(); 
@@ -424,12 +453,13 @@ tryLogin = () => {
     .then((response) => {
       this.secretToken = response.data.token;
       window.localStorage.setItem("token", response.data.token);
-      console.log("response.data", response.data)
+      //console.log("response.data", response.data)
        this.setState({
          authorized: true,
          inform: response.data.inform
       }) 
-      this.users();
+     
+     this.checkToken( this.state.myEmail );
     })
     .catch((err) => {
       this.setState({ inform: "Wrong combination or email invalidate!"})
@@ -446,9 +476,11 @@ sendFriendRequest = (email) => {
      email_target: email
    })
    .then(response => {
-      console.log("response.data.requestSentEmail", response.data );
-     
-       this.users();
+      //console.log("response.data.requestSentEmail", response.data );
+      //this.setState( { display: email } )
+     // this.users();  
+
+      
    })
    .catch(error => {
      console.log(error, "eroare la accesare")
@@ -463,7 +495,7 @@ revokeFriendRequest = (email) => {
    })
    .then(response => {
     console.log("response.data.revokefriendrequest", response.data );
-       this.users();
+      // this.users();
  
    })
    .catch(error => {
@@ -477,8 +509,8 @@ deniedFriendRequest = (email) => {
     email_target: email
   })
   .then(response => {
-
-      this.users();
+console.log(response)
+    //  this.users();
 
   })
   .catch(error => {
@@ -494,7 +526,7 @@ acceptFriendRequest = (email) => {
             .then( response => {
       console.log("response", response)
                
-                   this.users();
+                   //this.users();
            }) 
             .catch(error => {
                console.log(error, "eroare la accesare")
@@ -511,7 +543,7 @@ acceptFriendRequest = (email) => {
       .then(response => {
        console.log(" response",  response)
     
-              this.users();
+             // this.users();
        
       })
       .catch(error => {
@@ -520,14 +552,16 @@ acceptFriendRequest = (email) => {
      
   }
 
-checkToken = ()=>{
-
+checkToken = ( myEmail )=>{
+ // console.log("this.checkToken(); ........." )
       axios.post("http://localhost:4000/checkToken",{
           token: window.localStorage.getItem("token")
         })
         .then(response => {
-     
-          this.setState( { authorized: response.data.authorized})
+          console.log("check Token response OK!")
+          this.setState( { authorized: response.data.authorized })
+          
+          this.loadData( myEmail );
         })
         .catch(error => {
           console.log(error, "DB acces error")
@@ -537,67 +571,71 @@ checkToken = ()=>{
 
 sortFriends = () => {
   if (this.state.me.friends) {
-      return this.state.sugestions.filter((friend) => {
-      var exist = this.state.me.friends.some(email => email === friend.email);
-      return exist;
-    }).sort((a, b) => {
-      if (a.last_activity > b.last_activity) {
-        return -1;
-      } else if (a.last_activity < b.last_activity) {
-        return 1;
-      }
-      return 0;
-    })
+            return this.state.users.filter((friend) => {
+                var exist = this.state.me.friends.some(email => email === friend.email);
+                return exist;
+            }).sort((a, b) => {
+              if (a.last_activity > b.last_activity) {
+                  return -1;
+              } else if (a.last_activity < b.last_activity) {
+                  return 1;
+              }
+              return 0;
+            })
 
-    // return this.props.state.me.friends.map(email => {
-    //   var friends = [
-    //     ...this.props.state.friends,
-    //     this.props.state.sugestions.find(x => x.email === email)
-    //   ];
 
-    //   var orderedFriends = friends.sort((a, b) =>
-    //     a.last_activity < b.last_activity
-    //       ? 1
-    //       : b.last_activity < a.last_activity
-    //       ? -1
-    //       : 0
-    //   );
-
-    //   return orderedFriends;
-    // });
   } else {
-    return []
+          return []
   }
 };
+sortSugestions=()=>{
+  if( this.state.me.friends && this.state.users ){
+        return this.state.users.filter(user => 
+          user.email !== this.state.me.friends.find( el => el === user.email )
+        )
+        .filter( x => x.email !== this.state.me.email )
 
+   }
+}
+/*  
+ componentWillReceiveProps(){
 
-
-render() {
-  if(this.state.friends && 
-     this.state.friends !== undefined && 
-     this.state.me.friends &&
-     this.state.me.friends.length > 0 
-     ){
-          if (JSON.stringify(this.state.friends) !== JSON.stringify(this.sortFriends())) {
-            //console.log(" se activeaza")
-            this.setState({friends: this.sortFriends(),
-            // display: this.sortFriends()[0].email
-            })
-            this.display(this.sortFriends()[0].email)
-          }
-  }  else if (this.state.sugestions && this.state.sugestions.length > 0 ){
-        if(this.state.display !== this.state.sugestions[0].email){
-        //this.display(this.state.sugestions[0].email)
-        //this.setState( { display: this.state.sugestions[0].email })
-        console.log("s-a ajuns aici")
-        }
-
-  } 
+  if ( this.state.friends && 
+    this.state.friends !== undefined && 
+    this.state.me.friends &&
+    this.state.me.friends.length > 0 ){
+      if (JSON.stringify(this.state.friends) !== JSON.stringify(this.sortFriends())) {
+        
+        this.setState({ friends: this.sortFriends() })
+        console.log(" s-a activat functia de sortare prieteni din componentDidUpdate ", this.state.me.friends[0].email )
+        this.display( this.sortFriends()[0].email )
+      }
+} 
+if(this.state.users && this.state.sugestions){
+console.log(" s-a activat sortarea sugestiilor");
+    if (JSON.stringify(this.state.sugestions) !== JSON.stringify(this.sortSugestions())) {
+            console.log(" s-a activat functia de sortare sugestii din componentDidUpdate ")
+            this.setState({ sugestions: this.sortSugestions() })
+            if( this.state.me.friends && this.state.me.friends.length === 0 ){
+                  this.display( this.sortSugestions()[0].email )
+            }
+    }
+} 
+    
+}
  
+ */
+render() {
+
+/*   if(this.state.me && this.state.display === ""){
+    console.log("me loadet!", this.state.display)
+    this.display( this.state.me.email );
+  } else{
+    console.log("not loadet me!")
+  } */
+  
 
     if ( this.state.authorized ){
-     // this.reload(); 
-   
    
         return( 
           <Messenger 
@@ -615,8 +653,7 @@ render() {
                 editProfile={ this.editProfile }
                 profileChange={this.profileChange}
                 scrollUP ={this.scrollUP }
-                //getTextFragment={ this.getTextFragment }
-                //users={this.users}
+        
              />
         )
 

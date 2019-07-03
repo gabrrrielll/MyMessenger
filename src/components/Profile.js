@@ -3,11 +3,24 @@ import React, { Component } from 'react';
 
 class Profile extends Component {
     render() {
-        var user = this.props.state.sugestions.find( el => (el.email ===this.props.state.display) ) ;
-         
-        if (user === undefined) {
-           return <h3>Please select a user</h3>
-        } 
+        if ( !this.props.state.me ) return<h4><center>Loading...</center></h4>
+        if( this.props.state.users ){  
+                var user = this.props.state.users.find( el => (el.email ===this.props.state.display) ) ;
+        }
+         if (user === undefined) {
+           
+            if(  this && this.props.state.sugestions  &&  this.props.state.friends.length === 0){
+              user= this.props.state.sugestions[0]
+             // this.props.display( this.props.state.sugestions[0].email);
+              // console.log("111user in profil:----------", user )
+              }
+              if( this && this.props.state.friends && this.props.state.friends.length > 0 ){
+                 user = this.props.state.friends[0]
+                // console.log("2222user in profil:----------", user )
+              }
+                // return <h3>Please select a user</h3>
+        }
+    
 
         function convertUNIX(input) {
             var time = new Date(input);
@@ -16,27 +29,32 @@ class Profile extends Component {
           }
 
           var findUser = ( y ) =>{
-            var user = this.props.state.sugestions.find( x => x.email === y );
-            return user
-        }
-        
+            if( this.props.state.users ){
+                  var user =  this.props.state.users.find( el => ( el.email === y ) ) ;
+                 // console.log(" find user->", user)
+                  return user
+            }
+         }
+        //console.log("user selected------>", user)
         return ( 
             <div className="profile">
-                 { (this.props.state.me.friends_requests.length > 0 ) ?
+               
+                 { (this.props.state.me.friends_requests && this.props.state.me.friends_requests.length > 0 ) ?
                             ( <div className="alert-inform" 
                                     onClick={ this.props.showProfile } >
                                      <span role="img" aria-label="Notification" 
                                      title="Notification"  >
                                      🔔
                                      </span>
-                                    You have { this.props.state.me.friends_requests.length  } friendship requests !
+                                     You have { this.props.state.me.friends_requests.length  } friendship requests! <br />
+                                    Click to view
                              </div>
                              ) 
                          : null
                      }  
                    <div className="title">Profile</div>
                   
-                   { (Date.now() - user.last_activity < 120000 ) ?
+                  { ( user && user.last_activity && (Date.now() - user.last_activity < 120000) ) ?
                      ( <div className="last-activity">
                          <span id="online-bullet">
                             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Button_Icon_Green.svg/768px-Button_Icon_Green.svg.png"
@@ -45,24 +63,24 @@ class Profile extends Component {
                              Online 
                         </div> ): 
                     (<div className="last-activity">
-                         Last activity:  {convertUNIX(user.last_activity)}
+                         Last activity:  { user && convertUNIX(user.last_activity)}
                     </div>)}
-                 
+               
                     <div className="name">
-                         {user.firstname} {user.lastname}
+                    { user && user.firstname}  { user && user.lastname}
                        
                     </div>
                 
-                    <img src={ user.photo } alt={ user.email } />
+                    <img src= { user &&  user.photo } alt= { user &&  user.email } />
                     <div className="tel">
-                         Phone: { user.tel }
+                         Phone:  { user &&  user.tel }
                     </div>
                     <div className="email">
-                        Email: { user.email }
+                        Email:  { user && user.email }
                     </div>  
                     <div className="his-friends">
                     <div className="title">User's friends</div>
-                        {  user.friends && 
+                    { user &&  user.friends && 
                         user.friends
                         .filter( em => em !== this.props.state.me.email )
                         .map( email =>
@@ -76,7 +94,10 @@ class Profile extends Component {
                                           <img className="friend-photo" src={ findUser(email).photo} alt={findUser(email).username} />
                                           <span className="firstname">{findUser(email).firstname} </span>
                                           <span className="lastname">{findUser(email).lastname} </span>
-                                          { ! this.props.state.me.requests_sent.some( el => el === user.email  ) ? 
+                                          {  ( 
+                                              this.props.state.me.requests_sent.some( el => el === user.email  ) &&
+                                              this.props.state.me.friends.some( mail => mail === user.email )
+                                              ) ? 
                                                     (
                                                         <span className="addFriend">
                                                         <button
@@ -101,7 +122,7 @@ class Profile extends Component {
                                     </div>
                                   );
                             })}
-                    </div>
+                    </div>  
                    
             </div>
         );

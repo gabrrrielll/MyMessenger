@@ -26,7 +26,7 @@ class Message extends React.Component {
         }
     };
 
-    if( this &&  this.props.state.participants !== null  ){
+    if( this &&  this.props.state.participants !== null  && this.props.state.participants ){
         var seenTime = this.props.state.participants[0] &&
         this.props.state.participants.find( el => el.email !== this.props.state.me.email ).seen
         /* console.log("888888---:", this.props.state.participants[0] &&
@@ -44,7 +44,7 @@ class Message extends React.Component {
         }
       })
     } */
-
+    //console.log("this.props.state.conversatio-----------------", this.props.state.conversation)
   
     if( this.props.state.profile_edit ){
       return (
@@ -57,7 +57,7 @@ class Message extends React.Component {
        
       );
      }
-     if( this.props.state.info){
+     if(  this && this.props.state.conversation && this.props.state.conversation.length < 2){
       return (
       <div className="edit-profile">
             <Info
@@ -72,7 +72,9 @@ class Message extends React.Component {
       <div>
         <div className="title">Conversations</div>
         <div id="conversation">
-          { this.props.state.conversation && this.props.state.conversation.map((mes, index) => {
+          { this.props.state.conversation &&
+           this.props.state.conversation.map((mes, index) => {
+           
             return (
               <div key={index} id="message" className={ setStyle(mes.email) }>
                     { <span id="text-mesage"> { mes.text }  </span> }

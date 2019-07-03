@@ -511,8 +511,9 @@ span#counter {
   cursor: pointer;
   background: #ff9200c2;
   color: white;
-  height: 30px;
-  line-height: 30px;
+  line-height: 1.2;
+  padding: 6px;
+
 }
 #online-bullet img{
   width: 20px;

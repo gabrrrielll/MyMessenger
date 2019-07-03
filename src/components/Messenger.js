@@ -6,16 +6,15 @@ import Message from './Message';
 
 class Messenger extends Component{
     keyEnter=(e)=>{
-       // console.log(" 1--action e--", e)
-      //  var enterKey = 13; //Key Code for Enter Key
+        //  function for set enter key on submit messages
         if (e.charCode === 13 || e.keyCode === 13){
             this.props.sendMessage();
-           // console.log("action aaaaaaa--", e)
+          
         }}
     render () {
  
        
-       // this.props.users();
+
   return (
             <div id="block">
                     <div className="head"> 
@@ -28,35 +27,35 @@ class Messenger extends Component{
                             title="Profile" id="profile"
                             onClick={ this.props.showProfile }> 👨‍🔧
                             <span id="counter"  title="Friends requests">
-                                        {     (this.props.state.me.friends_requests ) ?
+                                        {     ( this.props.state.me && this.props.state.me.friends_requests ) ?
                                               ( this.props.state.me.friends_requests.length ) :
                                               ( <span>0</span> ) 
                                         }
-                  {/*    {console.log ( "this.props.state.me.friends_requests",this.props.state.me.friends_requests) } */}
+            
                     </span> 
                      </span>
                             <button id="logout" onClick ={this.props.logout} >Log Out</button>
                     </div>
                     <div className="box">
                         <div className="left"> 
-                            <Users display={this.props.display}
+                             <Users display={this.props.display}
                                   state={this.props.state}
                                   sendFriendRequest={this.props.sendFriendRequest}
                                   revokeFriendRequest={this.props.revokeFriendRequest}
                                   deniedFriendRequest={this.props.deniedFriendRequest}
                                   acceptFriendRequest={this.props.acceptFriendRequest}
                                   removeFriend={this.props.removeFriend}
-                                 // getTextFragment={this.props.getTextFragment}
-                                   />
+                                 
+                                   /> 
                         </div>
                         <div className="center" id="scroll">
-                                 <Message state={this.props.state}  
+                                 <Message state={ this && this.props.state}  
                                      updateData={this.props.updateData} 
                                      scrollUP ={this.props.scrollUP }
                                      profileChange={this.props.profileChange} />
-                                   {/*   {console.log( "this.props.state.friend", this.props.state.friends)} */}
-
+                                
                             { !this.props.state.profile_edit &&
+                            this.props.state.me &&
                                  this.props.state.me.friends && 
                             this.props.state.me.friends.some(
                                 el => el === this.props.state.display
@@ -85,12 +84,12 @@ class Messenger extends Component{
 
                          </div>
                                 <div className="right">
-                                    <Profile state={this.props.state}
+                                 <Profile state={this.props.state}
                                         showProfile={this.props.showProfile}
                                         display={this.props.display}
                                         sendFriendRequest={this.props.sendFriendRequest}
                                         revokeFriendRequest={this.props.revokeFriendRequest}
-                                        />
+                                        /> 
                          </div>
                         </div>
             </div>
