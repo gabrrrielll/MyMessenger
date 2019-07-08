@@ -39,7 +39,8 @@ class Profile extends Component {
         return ( 
             <div className="profile">
                
-                 { (this.props.state.me.friends_requests && this.props.state.me.friends_requests.length > 0 ) ?
+                 { (    this.props.state.me.friends_requests && 
+                        this.props.state.me.friends_requests.length > 0 ) ?
                             ( <div className="alert-inform" 
                                     onClick={ this.props.showProfile } >
                                      <span role="img" aria-label="Notification" 
@@ -86,40 +87,39 @@ class Profile extends Component {
                         .map( email =>
                             {
                                 return (
-                                    <div
-                                      className="user"
-                                      onClick={() => this.props.display(email)}
-                                      key={findUser(email)._id}
-                                    >
-                                          <img className="friend-photo" src={ findUser(email).photo} alt={findUser(email).username} />
-                                          <span className="firstname">{findUser(email).firstname} </span>
-                                          <span className="lastname">{findUser(email).lastname} </span>
-                                          {  ( 
-                                              this.props.state.me.requests_sent.some( el => el === user.email  ) &&
-                                              this.props.state.me.friends.some( mail => mail === user.email )
-                                              ) ? 
-                                                    (
-                                                        <span className="addFriend">
-                                                        <button
-                                                                title="Send friendship request"
-                                                                onClick={() => this.props.sendFriendRequest(user.email) }
-                                                        >
-                                                            Send
-                                                        </button>
-                                                        </span>
-                                                    ) : 
-                                                    (
-                                                        <span className="addFriend">
-                                                        <button
-                                                                title="Revoke friendship request"
-                                                                onClick={() => this.props.revokeFriendRequest(user.email) }
-                                                        >
-                                                            x
-                                                        </button>
-                                                        </span>
-                                                    )
-                                                }
-                                    </div>
+                                    <div className="user"
+                                            onClick={() => this.props.display(email)}
+                                            key={findUser(email)._id} >
+                                                 <div  className="first"  >
+                                                         <img className="friend-photo" src={ findUser(email).photo} alt={findUser(email).username} />
+                                                </div>
+                                                <div  className="middle"  >
+                                                    <div className="user-name">{findUser(email).firstname} {findUser(email).lastname}  </div>
+                                                </div>
+
+                                                {  ( 
+                                                    this.props.state.me.requests_sent.some( el => el === email  ) ||
+                                                    this.props.state.me.friends.some( elem => elem === email )
+                                                    ) ? 
+                                                            
+                                                            (
+                                                                <span className="addFriend">
+                                                                    <button  title="Revoke friendship request"
+                                                                                    onClick={() => this.props.revokeFriendRequest(email) }  >
+                                                                                    x
+                                                                    </button>
+                                                                </span>
+                                                            ) :
+                                                            (
+                                                                <span className="addFriend">
+                                                                    <button  title="Send friendship request"
+                                                                                    onClick={() => this.props.sendFriendRequest(email) } >
+                                                                                    Send
+                                                                    </button>
+                                                                </span>
+                                                            ) 
+                                                        }
+                                        </div>
                                   );
                             })}
                     </div>  

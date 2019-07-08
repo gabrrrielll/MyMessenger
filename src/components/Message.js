@@ -3,12 +3,19 @@ import ProfileEdit from "./ProfileEdit";
 import  Info from "./Info"
 
 class Message extends React.Component {
-
+  state = {
+    query: '',
+    results: []
+  }
   componentWillReceiveProps(){
       //scroll up the consversation
       this.props.scrollUP(); 
   }
- 
+  handleInputChange = () => {
+    this.setState({
+      query: this.search.value.toLowerCase()
+    })
+  }
   render() {
     
     function convertUNIX(input) {
@@ -34,18 +41,7 @@ class Message extends React.Component {
     } else {
          seenTime = null;
     }
-   
-/*     if (document.getElementById("message")){
-      var input = document.getElementById("message");
-      input.addEventListener("keyup", function(event) {
-        if (event.keyCode === 13) {
-         event.preventDefault();
-         document.getElementById("message-submit").click();
-        }
-      })
-    } */
-    //console.log("this.props.state.conversatio-----------------", this.props.state.conversation)
-  
+
     if( this.props.state.profile_edit ){
       return (
       <div className="edit-profile">
@@ -57,36 +53,46 @@ class Message extends React.Component {
        
       );
      }
-     if(  this && this.props.state.conversation && this.props.state.conversation.length < 2){
+     if(  this && !this.props.state.conversation /* && this.props.state.conversation.length ===1 */ ){
       return (
       <div className="edit-profile">
-            <Info
-               state={this.props.state} />
-         
+            <Info  state={this.props.state} />
       </div>
        
       );
      }
-
+    
     return (
-      <div>
+      <div id="intermediate">
         <div className="title">Conversations</div>
+        <input
+          placeholder="Search for messages..."
+          ref={input => this.search = input}
+          onChange={this.handleInputChange}
+          style={{width: "100%", padding:"2px 20px"}}
+        />
         <div id="conversation">
+     
           { this.props.state.conversation &&
            this.props.state.conversation.map((mes, index) => {
+            if (mes.text.toLowerCase().includes( this.state.query ) ){
            
             return (
               <div key={index} id="message" className={ setStyle(mes.email) }>
                     { <span id="text-mesage"> { mes.text }  </span> }
                     
-                    { ( mes.time >= seenTime ) ?
+                    { (mes.email === this.props.state.me.email) ?
+                    ( ( mes.time >= seenTime ) ?
                     ( <span role="img" aria-label="Check unseen" title="Message useen"> ✔</span> ) : 
                     (  <img src="https://www.clipartmax.com/png/full/51-513171_seen-whatsapp-vector.png"
-                    alt="seen" title="Message seen" width="20" /> )  } 
+                    alt="seen" title="Message seen" width="16" /> ) ) :
+                    null
+                      
+                        } 
                         
                     <span className="time-message"> { convertUNIX(mes.time) }</span>
               </div>
-            );
+            ); }
           }) }
         </div>
       </div>

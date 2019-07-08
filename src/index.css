@@ -301,7 +301,7 @@ p.underlineHover {
 }
 
 #logout{
-  float: right;
+  background: #4b4b4b;
   margin: 10px 20px;
 }
 .box{
@@ -317,6 +317,19 @@ p.underlineHover {
   box-shadow: 0px 2px 11px #343a4045;
   margin-bottom: 2px;
   position: relative;
+  display: flex;
+  justify-content: space-between;
+
+}
+.user-name {
+  position: absolute;
+  top: 11px;
+  left: 60px;
+  min-width: 176px;
+  width: 57%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .user-alert{
   text-align: left;
@@ -324,13 +337,16 @@ p.underlineHover {
   box-shadow: 0px 2px 11px #343a4045;
   margin-bottom: 2px;
   position: relative;
-  background: linear-gradient(270deg, #dd002c7e, #00dd5891, #0016dd52);
+
+  display: flex;
+  justify-content: space-between;
+  background: linear-gradient(270deg, #e40e3857, #0ca5499d, #0a1fdf32);
 background-size: 600% 600%;
 
--webkit-animation: alarm 1s ease infinite;
--moz-animation: alarm 1s ease infinite;
--o-animation: alarm 1s ease infinite;
-animation: alarm 1s ease infinite;
+-webkit-animation: alarm 2s ease infinite;
+-moz-animation: alarm 2s ease infinite;
+-o-animation: alarm 2s ease infinite;
+animation: alarm 2s ease infinite;
 
 }
 
@@ -400,8 +416,8 @@ animation: alarm 1s ease infinite;
   top: 0;
 }
 button {
-  float: right;
-  margin: 15px 10px 0 0;
+  height: 30px;
+  margin: auto 5px;
   border-radius: 4px;
   box-shadow: 2px 2px 2px #66747f52;
   cursor: pointer;
@@ -415,14 +431,16 @@ button {
   border-bottom: 1px solid grey;
 }
 
-
+.right-side{
+  float: right;
+}
 div#inputMessage {
    width: 50%;
     padding: 10px;
     position: fixed;
-    bottom: 0;
     background-color: rgba(0,123,255,.25);
-    bottom: -30px;
+    bottom: -25px;
+    height: 23%;
 }
 #inputMessage input{
   width: 100%;
@@ -430,18 +448,23 @@ div#inputMessage {
 input#message-submit {
   margin-left: 4px;
 }
+#intermediate{
+  height: 100%;;
+}
 #text-mesage {
-  padding: 9px 14px;
-  background: #7db0e7e0;
-  margin: 16px auto;
-  border-radius: 18px;
-  width: unset!important;
-  color: white;
-  line-height: 2;
+    padding: 5px 9px 6px;
+    background: #7db0e7e0;
+    border-radius: 15px;
+    max-width: 60%;
+    color: white;
+    line-height: 1.1;
+    word-break: break-word;
+    display: inline-block;
 
 }
+
 div#conversation {
-  height: 460px;
+  height: 67%;
   overflow-y: auto;
   position: relative;
   bottom: 0px;
@@ -490,22 +513,18 @@ button.addFriend img{
 }
 span#profile {
   font-size: 26px;
-  position: relative;
-  left: 88%;
   cursor: pointer;
-  top: 6px;
 }
 span#counter {
-  position: absolute;
-  top: -8px;
-  right: -9px;
+  position: relative;
+  top: -15px;
+  right: 9px;
   font-size: 16px;
   background: white;
   border-radius: 50%;
-  width: 20px;
-  height: 20px;
   line-height: 20px;
   text-align: center;
+  padding: 0px 5px;
 }
 .alert-inform {
   cursor: pointer;
@@ -534,13 +553,7 @@ span#counter {
   border-radius: 6px;
 }
 
-#logout {
-  background: #4b4b4b;
-}
-div#message {
-  position: relative;
-  bottom: 40px;
-}
+
 .message_fragment {
   text-align: left;
   width: 90%;
@@ -558,11 +571,21 @@ div#message {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+#normal{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+div#bold {
+  font-weight: 600;
+  color: black;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 span#edit-profile {
   font-size: 37px;
-  position: absolute;
-  top: -2px;
-  right: 175px;
+
   font-weight: 900;
   cursor: pointer;
 }

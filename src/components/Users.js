@@ -1,12 +1,25 @@
 import React, { Component } from "react";
 
 class Users extends Component {
-  state = { data: {} };
-  
-  render() {
-    if ( !this.props.state.me ) return<h4><center>Loading...</center></h4>
-    //console.log(this.sortFriends());
+  state = {
+    query: '',
+    results: []
+  }
 
+  
+ handleInputChange = () => {
+  this.setState({
+    query: this.search.value.toLowerCase()
+  })
+}
+
+  render() {
+    if ( !this.props.state.me ) {
+
+      return<h4><center>Loading...</center></h4>
+    }
+ 
+   
     var findUser = ( y ) =>{
           if( this.props.state.users ){
                 var user =  this.props.state.users.find( el => el.email === y  ) ;
@@ -15,45 +28,65 @@ class Users extends Component {
           }
     }
 
-    var styleDisplay = email => {
-      if (
-        this.props.state.data &&
-        this.props.state.data.find(el => el.userEmail === email) &&
-        ( this.props.state.data.find(el => el.userEmail === email).seenTime <
-          this.props.state.data.find(el => el.userEmail === email).message.time )
-      ) {
-        return null;
-      } else {
-        return "bold";
-      }
-    };
     var setClass = email => {
-      if ( this &&
-        this.props.state.data &&
-        this.props.state.data.find(el => el.userEmail === email) &&
-        ( this.props.state.data.find(el => el.userEmail === email).seenTime <
-          this.props.state.data.find(el => el.userEmail === email).message.time )
+      if (  this &&
+            this.props.state.data &&
+            //check if the fragment is in the data list
+            this.props.state.data.find(el => el.userEmail === email) &&
+            // check if message is from from partener 
+            this.props.state.data.find( el => el.userEmail === email ).message.email === email  && 
+            //  check if is seen from me
+            ( this.props.state.data.find(el => el.userEmail === email).message.time >
+            this.props.state.data.find(el => el.userEmail === email).seenTime )
       ) {
-        return "user";
-      } else {
         return "user-alert";
+      } else {
+        return "user";
       }
     };
 
     var extractFragment = email => {
-    
-      if (
-        this.props.state.data &&
-        this.props.state.data.find(el => el.userEmail === email)
-      ) {  // console.log(" this.props.state.data", this.props.state.data)
-        return this.props.state.data.find(el => el.userEmail === email).message.text;
+     //check if the fragment is in the data list
+      if ( this.props.state.data &&
+          this.props.state.data.find(el => el.userEmail === email ) ) {  // console.log(" this.props.state.data", this.props.state.data)
+              // check if message is from from partener 
+              if( this.props.state.data.find( el => el.userEmail === email ).message.email !== email ){
+                // this fragment is from me
+                return(<div id="normal">
+                              You: { this.props.state.data.find(el => el.userEmail === email).message.text}
+                            </div>  )
+              } else {
+                     // this fragment is from partener, so check if is seen from me
+                    if( this.props.state.data.find(el => el.userEmail === email).message.time >
+                    this.props.state.data.find(el => el.userEmail === email).seenTime ){
+                      // the message was not see, so make it bold
+                      return(<div id="bold">
+                       { this.props.state.data.find(el => el.userEmail === email).message.text}
+                    </div>  )
+                    } else {
+                      // the message was see, so make it normal
+                      return (<div id="normal">
+                      { this.props.state.data.find(el => el.userEmail === email).message.text}
+                    </div>  )
+                    }
+                
+              }
+            
       } else {
+        //the fragment is not in the list
         return "";
       }
     };
 
     return (
       <div className="users">
+        <input
+          placeholder="Search for users..."
+          ref={input => this.search = input}
+          onChange={this.handleInputChange}
+          style={{width: "100%", padding:"2px 20px"}}
+        />
+        
         <div className="title">Friends </div>
         { this.props.state.me && this.props.state.me.friends_requests &&
           this.props.state.show &&
@@ -64,17 +97,19 @@ class Users extends Component {
                 onClick={() => this.props.display(email)}
                 key={findUser(email)._id}
               >
-                <img
-                  src={findUser(email).photo}
-                  alt={findUser(email).username}
-                />
-                <span className="firstname">{findUser(email).firstname} </span>
-                <span className="lastname">{findUser(email).lastname} </span>
+                 <div  className="first"  >
+                          <img src={findUser(email).photo}  alt={findUser(email).username} />
+                  </div>
+                  <div  className="middle"  >
+                      <div className="user-name">{findUser(email).firstname} {findUser(email).lastname}  </div>
+                      <div  className="message_fragment"  >  {extractFragment(email)}  </div>
+                  </div>
+                
                 <button
-                  className="addFriend"
-                  onClick={() => this.props.acceptFriendRequest(email)}
-                  name="Accept friend "
-                  title="Accept friendship request "
+                      className="addFriend"
+                      onClick={() => this.props.acceptFriendRequest(email)}
+                      name="Accept friend "
+                      title="Accept friendship request "
                 >
                   <span role="img" aria-label="Check">
                     ✅ ?
@@ -96,117 +131,84 @@ class Users extends Component {
           })}
           
          
-         {this && this.props.state.users &&
-          this.props.state.me.friends && 
-        this.props.state.me.friends.length > 0  ? (
-          this.props.state.me.friends.map(email => {
-            return (
-              <div
-                className={setClass(email)}
-                onClick={() => this.props.display(email)}
-                key={findUser(email) && findUser(email)._id}
+         { this && this.props.state.users &&
+          this.props.state.friends && 
+        this.props.state.friends.length > 0  ? (
+          this.props.state.friends.map(
+            user => {
+              if (user.firstname.toLowerCase().includes( this.state.query ) ||
+              user.lastname.toLowerCase().includes( this.state.query ) ){
+           return (
+              <div  className={setClass(user.email)} 
+                   onClick={() => this.props.display(user.email)}
+                   key={user._id}
               >
-                <img
-                  src={findUser(email) && findUser(email).photo}
-                  alt={findUser(email) && findUser(email).username}
-                />
-                <span className="firstname">{findUser(email) && findUser(email).firstname} </span>
-                <span className="lastname">{findUser(email) && findUser(email).lastname} </span>
-                <div
-                  className="message_fragment"
-                  style={{ fontWeight: styleDisplay(email) }}
-                >
-                  {extractFragment(email)} 
-                </div>
-                <button
-                  className="addFriend"
-                  title="Remove friend"
-                  onClick={() => this.props.removeFriend(email)}
+                 <div  className="first"  >
+                          <img src={user.photo} alt={user.username} />
+                  </div>
+                  <div  className="middle"  >
+                      <div className="user-name">{user.firstname} {user.lastname} </div>
+                      <div  className="message_fragment"  >  {extractFragment(user.email)}  </div>
+                  </div>
+                <button className="addFriend"
+                    title="Remove friend"
+                     onClick={() => this.props.removeFriend(user.email)}
                 >
                   <span role="img" aria-label="Delete">
                     ❌
                   </span>
                 </button>
               </div>
-            );
+            ); }
           })
         ) : (
           <center> You don't have friends yet </center>
         ) } 
 
         <div className="title">Sugestions</div>
-        {this &&
+         { this &&
           this.props.state.sugestions &&
           this.props.state.sugestions.map( user => {
-            return (
-              <div
-                  className="user"
-                  onClick={() => this.props.display(user.email)}
-                  key={user._id}
-                >
-                  <img src={user.photo} alt={user.username} />
-                  <span className="firstname">{user.firstname} </span>
-                  <span className="lastname">{user.lastname} </span>
+            if (user.firstname.toLowerCase().includes( this.state.query ) ||
+                 user.lastname.toLowerCase().includes( this.state.query ) ){
+              return (
+            
+                <div  className="user"
+                        onClick={() => this.props.display(user.email)}
+                        key={user._id}>
+                         
+                              <div  className="first"  >
+                                      <img src={user.photo} alt={user.username} />
+                              </div>
+                              <div  className="middle"  >
+                                  <div className="user-name">{user.firstname} {user.lastname} </div>
+                                  <div  className="message_fragment"  >  {extractFragment(user.email)}  </div>
+                              </div>
+  
+                              { !this.props.state.me.requests_sent
+                              .some( el => el === user.email ) ? 
+                              (
+                                <button
+                                        className="addFriend"
+                                        title="Send friendship request"
+                                        onClick={() => this.props.sendFriendRequest(user.email)}>
+                                        Send
+                                </button>
+                              ) : (
+                                <button
+                                        className="addFriend"
+                                        title="Revoke friendship request"
+                                        onClick={() => this.props.revokeFriendRequest(user.email)}>
+                                        x
+                                </button>
+                      )}
+              </div>
+                )
+            }
+           
 
-                  {!this.props.state.me.requests_sent.some(
-                    el => el === user.email
-                  ) ? (
-                    <button
-                      className="addFriend"
-                      title="Send friendship request"
-                      onClick={() => this.props.sendFriendRequest(user.email)}
-                    >
-                      Send
-                    </button>
-                  ) : (
-                    <button
-                      className="addFriend"
-                      title="Revoke friendship request"
-                      onClick={() => this.props.revokeFriendRequest(user.email)}
-                    >
-                      x
-                    </button>
-                  )}
-                </div>
-            )
-          })
-          //exclude me and my allready friends from sugestions list
-           // .filter(user => user.email !== this.props.state.me.email &&  user.email !== this.props.state.me.friends.find( email => email === user.email ))
-          /*   .map(user => {
-              return this.props.state.me.friends.some(
-                el => el.email === user.email
-              ) ? null : (
-                <div
-                  className="user"
-                  onClick={() => this.props.display(user.email)}
-                  key={user._id}
-                >
-                  <img src={user.photo} alt={user.username} />
-                  <span className="firstname">{user.firstname} </span>
-                  <span className="lastname">{user.lastname} </span>
-
-                  {!this.props.state.me.requests_sent.some(
-                    el => el === user.email
-                  ) ? (
-                    <button
-                      className="addFriend"
-                      title="Send friendship request"
-                      onClick={() => this.props.sendFriendRequest(user.email)}
-                    >
-                      Send
-                    </button>
-                  ) : (
-                    <button
-                      className="addFriend"
-                      title="Revoke friendship request"
-                      onClick={() => this.props.revokeFriendRequest(user.email)}
-                    >
-                      x
-                    </button>
-                  )}
-                </div>
-              );
-            }) */
+                })
+                
           } 
       </div>
     );
