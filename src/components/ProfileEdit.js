@@ -42,7 +42,10 @@ const ProfileEdit = ( props ) =>{
                   </tbody>
               </table>
                   <input type="submit" className="fadeIn fourth" onClick={props.profileChange} value="Submit"  /> <br/>  
-                <label id="inform">{props.state.inform}</label>   
+
+                   { props.state.inform ?
+                  <label id="inform">{props.state.inform}</label>  :
+                  null  }  
                 
               
         </div>

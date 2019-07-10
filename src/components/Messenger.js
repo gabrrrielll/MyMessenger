@@ -17,7 +17,7 @@ class Messenger extends Component{
        
   return (
             <div id="block">
-                     <div className="head"> 
+                     <div className="head" style={{ backgroundColor: this.props.state.me.color }} > 
                             <table className="right-side">
                         <tbody>
                             <tr>
@@ -67,15 +67,16 @@ class Messenger extends Component{
                                      scrollUP ={this.props.scrollUP }
                                      profileChange={this.props.profileChange} />
                                 
-                            { !this.props.state.profile_edit &&
-                            this.props.state.me &&
+                            {(//  !this.props.state.profile_edit ||
+                            
+                                this.props.state.me &&
                                  this.props.state.me.friends && 
                             this.props.state.me.friends.some(
                                 el => el === this.props.state.display
-                            ) ?  (
-                                <div id="inputMessage">  
-                                { ( this.props.state.inform ) ?
-                                (<label id="inform">{this.props.state.inform}</label>  )
+                            ) )?  (
+                                <div id="inputMessage" style={{ backgroundColor: this.props.state.me.color+"52" }}>  
+                                { ( this.props.state.info ) ?
+                                (<label id="inform">{this.props.state.info}</label>  )
                                  : null }
                                            
                                 <input type="text" 
@@ -88,7 +89,7 @@ class Messenger extends Component{
                                 />
                         
                             <span>
-                                    <input type="submit" 
+                                    <input type="submit" style={{ backgroundColor: this.props.state.me.color }}
                                             id="message-submit"
                                             value="Send"
                                             onClick={  this.props.sendMessage }
@@ -104,6 +105,8 @@ class Messenger extends Component{
                                  <Profile state={this.props.state}
                                         showProfile={this.props.showProfile}
                                         display={this.props.display}
+                                        setColor={this.props.setColor}
+                                        updateData={this.props.updateData}
                                         sendFriendRequest={this.props.sendFriendRequest}
                                         revokeFriendRequest={this.props.revokeFriendRequest}
                                         /> 

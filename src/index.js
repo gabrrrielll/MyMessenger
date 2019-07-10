@@ -27,8 +27,10 @@ class FrontendApp extends React.Component {
       photo: "",
       message: "",
       inform: "",
+      info: "",
       myEmail: "",
       me: "",
+      color: "#56baed",
       users: [],
       autentificate: true,
       authorized: false,
@@ -282,11 +284,44 @@ updateData = (event) => {
     
     this.setState({
       [event.target.id]: event.target.value,
-      inform: ""
+      inform: "",
+      info: ""
     })
    
   }
+
+  setColor=()=>{  
+
+    if ( this.state.color ){
+      var color = this.state.favcolor
+    } else {
+      color = this.state.me.color
+    }
+  axios.post("http://localhost:4000/changecolorprofile",{
+   
+    token: window.localStorage.getItem("token"),
+    color: color
+  })
+  .then( response => {
+   // this.users();
+   this.loadData();
+        console.log(" response",  response)
+       
+         if (this.state.me.email){
+          this.setState( {
+             inform: response.data.inform,
+            display: this.state.me.email,
+            color: this.state.favcolor
+           })
+        } 
+       
+  })
+  .catch(error => {
+        console.log(error, "eroare la accesare")
+  });
+}
 profileChange = () =>{
+
         if ( this.state.firstname ){
           var firstname = this.state.firstname
         } else {
@@ -307,6 +342,11 @@ profileChange = () =>{
         } else {
           photo = this.state.me.photo
         }
+        if ( this.state.color ){
+          var color = this.state.color
+        } else {
+          color = this.state.me.color
+        }
       axios.post("http://localhost:4000/changeprofile",{
        
         token: window.localStorage.getItem("token"),
@@ -315,7 +355,8 @@ profileChange = () =>{
         original_pass: this.state.password,
         new_pass: this.state.rpassword,
         tel: tel,
-        photo: photo
+        photo: photo,
+        color: color
       })
       .then( response => {
         //this.users();
@@ -334,6 +375,7 @@ profileChange = () =>{
             this.setState( { inform: "Old password didn't match!"})
       });
 }
+
 changeForm =() =>{
     this.setState({ autentificate: !this.state.autentificate} );
   }
@@ -378,7 +420,7 @@ showProfile = () => {
   
 }
 editProfile=()=>{
-  if (this.state.me && this.state.display === this.state.me.email){
+/*   if (this.state.me && this.state.display === this.state.me.email){
               if (this.state.friends && this.state.friends.length > 0){
                 var dis = this.state.friends[0].email
               } else {
@@ -386,12 +428,12 @@ editProfile=()=>{
               }   
   } else{
     dis = this.state.me.email
-  }
+  } */
   this.setState( {
    
      profile_edit: !this.state.profile_edit ,
-     display: dis,
-     inform: ""
+     display: this.state.me.email,
+      inform: " If you don't want change your password, just leave the fields empty"
     } )
 }
 
@@ -399,7 +441,7 @@ sendMessage = ( ) =>{
 console.log(" toUserEmail",  this.state.message );
   if( this.state.message === "" ) return; 
   if( this.state.message.length >1000 ) {  
-       this.setState( { inform: "This message is longer than 1000 characters!" }) ; 
+       this.setState( { info: "This message is longer than 1000 characters!" }) ; 
        return;
        }
 
@@ -413,11 +455,12 @@ console.log(" toUserEmail",  this.state.message );
       .then(res => {
           console.log( " sendMessage res.data: ", res.data  );
        // this.display(this.state.display);
-        this.setState( { message: "", inform: "" })
+        this.setState( { message: "", info: "" })
         this.scrollUP(); 
       })
       .catch(err => {
           console.log(err)
+          this.setState( { message: "", info: "This message is longer than 1000 characters!"  })
       }) 
       this.scrollUP(); 
       
@@ -544,20 +587,22 @@ acceptFriendRequest = (email) => {
  }
 
  removeFriend =(email) =>{
-   alert("You will delete this user from your friends list. Are you sure?")
-   axios.post("http://localhost:4000/removefriend",{
-        token: window.localStorage.getItem("token"),
-        email_target: email
-      })
-      .then(response => {
-       console.log(" response",  response)
-    
-             // this.users();
-       
-      })
-      .catch(error => {
-        console.log(error, "eroare la accesare")
-      });
+      var confirmation = window.confirm("You will delete this user from your friends list. Are you sure?")
+      if(confirmation){
+          axios.post("http://localhost:4000/removefriend",{
+            token: window.localStorage.getItem("token"),
+            email_target: email
+          })
+          .then(response => {
+          console.log(" response",  response)
+        
+                // this.users();
+          
+          })
+          .catch(error => {
+            console.log(error, "eroare la accesare")
+          });
+      }
      
   }
 
@@ -636,7 +681,8 @@ render() {
                   showProfile={ this.showProfile }
                   editProfile={ this.editProfile }
                   profileChange={this.profileChange}
-                  scrollUP ={this.scrollUP }  /> } />
+                  scrollUP ={this.scrollUP } 
+                  setColor={this.setColor}  /> } />
   
     
         <Route path="/login" render={props => <LogIn 

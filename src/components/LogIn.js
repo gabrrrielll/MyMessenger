@@ -11,8 +11,11 @@ const LogIn = (props)=> {
                             onChange={props.updateData} value={props.myEmail}/>
                     <input type="text" id="password" className="fadeIn third" name="password" placeholder="Password"
                             onChange={props.updateData} value={props.password}/>
-                    <input type="submit" className="fadeIn fourth" value="Log In" onClick={props.tryLogin} />   <br/>   
+                    <input type="submit" className="fadeIn fourth" value="Log In" onClick={props.tryLogin} />   <br/> 
+                    { props.state.inform ?
                     <label  id="inform">{props.state.inform}</label>
+                    : null  }  
+                    
                 <div id="formFooter">
                         <p className="underlineHover"  onClick={props.changeForm}>You don't have a count? <b>Register!</b></p>
                 </div>

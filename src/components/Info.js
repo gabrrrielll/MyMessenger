@@ -11,8 +11,10 @@ const Info = ( props ) =>{
                   <h5>So, make some friends...<span role="img" aria-label="Check">
                   🤝
                   </span></h5>
-                <label id="inform">{props.state.inform}</label>   
-                
+                  { props.state.inform ?
+                  <label id="inform">{props.state.inform}</label>  :
+                  null  }
+                   
               <div id="formFooter">
               
           </div>

@@ -64,35 +64,41 @@ class Message extends React.Component {
     
     return (
       <div id="intermediate">
-        <div className="title">Conversations</div>
+    
         <input
-          placeholder="Search for messages..."
+          placeholder=" 🔍  Search for messages... "
           ref={input => this.search = input}
           onChange={this.handleInputChange}
-          style={{width: "100%", padding:"2px 20px"}}
+          style={{width: "100%", padding:"4px 10px", backgroundColor: this.props.state.me.color+"52" }}
         />
+            <div className="title">Conversations</div>
         <div id="conversation">
      
           { this.props.state.conversation &&
            this.props.state.conversation.map((mes, index) => {
             if (mes.text.toLowerCase().includes( this.state.query ) ){
            
-            return (
-              <div key={index} id="message" className={ setStyle(mes.email) }>
-                    { <span id="text-mesage"> { mes.text }  </span> }
-                    
-                    { (mes.email === this.props.state.me.email) ?
-                    ( ( mes.time >= seenTime ) ?
-                    ( <span role="img" aria-label="Check unseen" title="Message useen"> ✔</span> ) : 
-                    (  <img src="https://www.clipartmax.com/png/full/51-513171_seen-whatsapp-vector.png"
-                    alt="seen" title="Message seen" width="16" /> ) ) :
-                    null
-                      
-                        } 
-                        
-                    <span className="time-message"> { convertUNIX(mes.time) }</span>
-              </div>
-            ); }
+                  return (
+                        <div key={index} id="message" className={ setStyle(mes.email) }>
+                              { <span id="text-mesage"
+                              
+                                style={ mes.email !== this.props.state.me.email ?
+                                  ( { backgroundColor: this.props.state.me.color+"bd" } ): null
+                                 } > { mes.text }  </span> }
+                              
+                              { (mes.email === this.props.state.me.email) ?
+                              ( ( mes.time >= seenTime ) ?
+                              ( <span role="img" aria-label="Check unseen" title="Message useen"> ✔</span> ) : 
+                              (  <img src="https://www.clipartmax.com/png/full/51-513171_seen-whatsapp-vector.png"
+                              alt="seen" title="Message seen" width="16" /> ) ) :
+                              null
+                                
+                                  } 
+                                  
+                              <span className="time-message"> { convertUNIX(mes.time) }</span>
+                        </div>
+                  );
+           } else return null;
           }) }
         </div>
       </div>

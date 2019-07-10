@@ -1,8 +1,14 @@
 import React, { Component } from 'react';
+//import { ColorPicker } from 'react-input-color';
+
 
 
 class Profile extends Component {
+
+
     render() {
+      
+
         if ( !this.props.state.me ) return<h4><center>Loading...</center></h4>
         if( this.props.state.users ){  
                 var user = this.props.state.users.find( el => (el.email ===this.props.state.display) ) ;
@@ -79,6 +85,21 @@ class Profile extends Component {
                     <div className="email">
                         Email:  { user && user.email }
                     </div>  
+
+                    {   this.props.state.display === this.props.state.me.email ? 
+                        ( <div>
+                            <h6>Click and select your favorite color: </h6>
+                            <input type="color" 
+                            style={{ width:" 30px", height:" 30px", borderRadius: "50%", display: "inline" }}
+                            name="favcolor" id="favcolor"
+                            defaultValue={this.props.state.color}
+                            onChange={this.props.updateData} />
+                            <input type="submit" value="Save" onClick = {this.props.setColor }
+                            style={{ backgroundColor: this.props.state.me.color, padding:" 4px 12px", display: "inline", position: "relative", top: "-5px" }}/>
+                            </div>                                          
+                        ) : null 
+                    }
+                  
                     <div className="his-friends">
                     <div className="title">User's friends</div>
                     { user &&  user.friends && 
@@ -94,7 +115,9 @@ class Profile extends Component {
                                                          <img className="friend-photo" src={ findUser(email).photo} alt={findUser(email).username} />
                                                 </div>
                                                 <div  className="middle"  >
-                                                    <div className="user-name">{findUser(email).firstname} {findUser(email).lastname}  </div>
+                                                    <div className="user-name" style={{ top: "18px"}}>
+                                                                 {findUser(email).firstname} {findUser(email).lastname}
+                                                      </div>
                                                 </div>
 
                                                 {  ( 
@@ -103,20 +126,24 @@ class Profile extends Component {
                                                     ) ? 
                                                             
                                                             (
-                                                                <span className="addFriend">
-                                                                    <button  title="Revoke friendship request"
-                                                                                    onClick={() => this.props.revokeFriendRequest(email) }  >
+                                                               
+                                                                    <button  className="addFriend"
+                                                                     title="Revoke friendship request"
+                                                                                    onClick={() => this.props.revokeFriendRequest(email) } 
+                                                                                    style={{ backgroundColor: this.props.state.me.color+"cc" }} >
                                                                                     x
                                                                     </button>
-                                                                </span>
+                                                           
                                                             ) :
                                                             (
-                                                                <span className="addFriend">
-                                                                    <button  title="Send friendship request"
-                                                                                    onClick={() => this.props.sendFriendRequest(email) } >
+                                                             
+                                                                    <button  className="addFriend"
+                                                                     title="Send friendship request"
+                                                                                    onClick={() => this.props.sendFriendRequest(email) } 
+                                                                                    style={{ backgroundColor: this.props.state.me.color+"cc" }}>
                                                                                     Send
                                                                     </button>
-                                                                </span>
+                                                         
                                                             ) 
                                                         }
                                         </div>

@@ -52,7 +52,10 @@ const Register = ( props ) =>{
                   </tbody>
               </table>
                   <input type="submit" className="fadeIn fourth" onClick={props.tryRegister} value="Register"  /> <br/>  
-                <label id="inform">{props.state.inform}</label>   
+                  { props.state.inform ?
+                <label id="inform">{props.state.inform}</label> :
+                null  }
+                  
                 
               <div id="formFooter">
                 <p className="underlineHover"  onClick={props.changeForm}>Do you have a count?<b>Login!</b> </p>
