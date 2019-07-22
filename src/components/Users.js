@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 
+
 class Users extends Component {
   state = {
     query: '',
@@ -88,9 +89,9 @@ class Users extends Component {
         />
         
         <div className="title">Friends </div>
-        { this.props.state.me && this.props.state.me.friends_requests &&
+        { this.props.state.me && this.props.state.friends_requests &&
           this.props.state.show &&
-          this.props.state.me.friends_requests.map(email => {
+          this.props.state.friends_requests.map(email => {
             return (
               <div
                 className="user request"

@@ -23,13 +23,71 @@ class Message extends React.Component {
       return time.toLocaleTimeString();
       // time.toGMTString() + '\n' +
     }
+    function convertDayUNIX(input) {
+     
+      var time = new Date(input);
+      var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+     // return time.toLocaleTimeString();
+      return time.toLocaleDateString('en-EN', options)
+    }
 
-    const setStyle = email => {
+
+      var nr = 0;
+     const setStyle=( index, mes )=>{
+        //console.log( "nr----?->", nr," index->", index )
+        if( mes.email !== this.props.state.me.email &&  document.getElementById( index )){
+        //  document.getElementById( index).style.backgroundColor = this.props.state.me.color ;
+        }
+            if((  index > 1 && mes.email !== this.props.state.conversation[ index - 1 ].email ) //||
+          // ( index > 1 && convertDayUNIX(mes.time) !== convertDayUNIX( this.props.state.conversation[index-1].time) ) 
+           ){
+              nr = 0;  
+            }
+          if( index > 1 &&  nr === 0 &&  document.getElementById( index)) {
+          //  document.getElementById( index).className =" text-mesage middle";
+          }
+          if( index > 1 && nr ===1 &&  document.getElementById( index ) // &&
+           //( convertDayUNIX(mes.time) === convertDayUNIX( this.props.state.conversation[index-1].time))
+          ){
+       
+           document.getElementById( index -nr ).className ="text-mesage up"; 
+           document.getElementById( index  ).className ="text-mesage down";
+           }
+          if( index > 1 && nr > 1 &&  document.getElementById( index ) // &&
+         // ( convertDayUNIX(mes.time) === convertDayUNIX( this.props.state.conversation[index-1].time))
+          ){
+           //console.log( "nr----?->", nr," index->", index )
+           
+           document.getElementById( index -1 ).className ="text-mesage middle";
+         
+           document.getElementById( index ).className ="text-mesage down";  
+           document.getElementById( index - nr ).className ="text-mesage up";  
+          }
+          nr++;
+         if( mes.email !== this.props.state.me.email)
+        return( 
+          { backgroundColor: this.props.state.me.color+"bd" }
+          ) 
+         
+     }
+   
+
+      
+
+      
+
+    const setPosition =( email, index )=> {
       
         if ( this.props.state.me.email !== email) {
-            return "oriented-left";
+              if (  index > 1 && email !== this.props.state.conversation[ index - 1 ].email ){
+                return " oriented-left ";
+              } else
+              return " oriented-left ";
         } else {
-            return "oriented-right";
+          if (  index > 1 && email !== this.props.state.conversation[ index - 1 ].email ){
+            return " oriented-right ";
+          } else
+            return " oriented-right " ;
         }
     };
 
@@ -61,7 +119,9 @@ class Message extends React.Component {
        
       );
      }
-    
+  
+ 
+
     return (
       <div id="intermediate">
     
@@ -77,23 +137,28 @@ class Message extends React.Component {
           { this.props.state.conversation &&
            this.props.state.conversation.map((mes, index) => {
             if (mes.text.toLowerCase().includes( this.state.query ) ){
-           
+
+
                   return (
-                        <div key={index} id="message" className={ setStyle(mes.email) }>
-                              { <span id="text-mesage"
-                              
-                                style={ mes.email !== this.props.state.me.email ?
-                                  ( { backgroundColor: this.props.state.me.color+"bd" } ): null
-                                 } > { mes.text }  </span> }
-                              
+                        <div key={index} id="message"
+                         className={ setPosition( mes.email, index ) }>
+
+{ /*  ( index > 1  && 
+  (  convertDayUNIX(mes.time) !==
+    convertDayUNIX( this.props.state.conversation[index-1].time)  ||
+   index === 0 )) ? 
+(  <div className="date-time"> { convertDayUNIX(mes.time) }</div> )
+ : null   */
+ }
+                              { <span className="text-mesage"  style={ setStyle( index, mes ) }
+                               id={index } > { mes.text } </span> }
+                           
                               { (mes.email === this.props.state.me.email) ?
                               ( ( mes.time >= seenTime ) ?
-                              ( <span role="img" aria-label="Check unseen" title="Message useen"> ✔</span> ) : 
+                              ( <span role="img" className="unseed" aria-label="Check unseen" title="Message useen"> ✔</span> ) : 
                               (  <img src="https://www.clipartmax.com/png/full/51-513171_seen-whatsapp-vector.png"
                               alt="seen" title="Message seen" width="16" /> ) ) :
-                              null
-                                
-                                  } 
+                              null } 
                                   
                               <span className="time-message"> { convertUNIX(mes.time) }</span>
                         </div>
